@@ -1,61 +1,75 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Mobile Menu Toggle
+
+    // 2. Glow Tracking Card Effect
+    const glowCards = document.querySelectorAll('.card, .portfolio-card, .cs-service-box, .cs-info-card');
+    document.body.addEventListener('mousemove', e => {
+        for(const card of glowCards) {
+            const rect = card.getBoundingClientRect(),
+                  x = e.clientX - rect.left,
+                  y = e.clientY - rect.top;
+
+            card.style.setProperty("--mouse-x", `${x}px`);
+            card.style.setProperty("--mouse-y", `${y}px`);
+        }
+    });
+
+    // 3. Mobile Menu Toggle
     const mobileBtn = document.querySelector('.mobile-menu-btn');
     const navLinks = document.querySelector('.nav-links');
 
-    if(mobileBtn) {
+    if (mobileBtn) {
         mobileBtn.addEventListener('click', () => {
             navLinks.classList.toggle('nav-active');
-            // Toggle hamburger icon (optional)
-            const icon = mobileBtn.innerHTML;
-            if(navLinks.classList.contains('nav-active')){
-                mobileBtn.innerHTML = '✕';
-            } else {
-                mobileBtn.innerHTML = '☰';
-            }
+            mobileBtn.innerHTML = navLinks.classList.contains('nav-active') ? '✕' : '☰';
         });
     }
 
-    // Scroll Effects (Fade up elements)
-    const fadeElements = document.querySelectorAll('.fade-up');
-    
+    // 4. Advanced Scroll Observers (Staggered Reveals)
+    const fadeElements = document.querySelectorAll('.fade-up, .fade-up-stagger');
     const observerOptions = {
         root: null,
         rootMargin: '0px',
-        threshold: 0.15
+        threshold: 0.1
     };
 
     const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
-                observer.unobserve(entry.target); // Optional: remove this if you want it to fade out when scrolling up
+                // Unobserve for better performance after reveal
+                observer.unobserve(entry.target); 
             }
         });
     }, observerOptions);
 
-    fadeElements.forEach(el => {
-        observer.observe(el);
-    });
+    fadeElements.forEach(el => observer.observe(el));
 
-    // Make Navbar Glassy on Scroll
+    // 5. Glassmorphism Navbar Scroll
     const navbar = document.querySelector('.navbar');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.style.background = 'rgba(5, 5, 5, 0.9)';
-            navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
-        } else {
-            navbar.style.background = 'rgba(5, 5, 5, 0.7)';
-            navbar.style.boxShadow = 'none';
-        }
-    });
+    if (navbar) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(5, 5, 5, 0.85)';
+                navbar.style.backdropFilter = 'blur(16px)';
+                navbar.style.webkitBackdropFilter = 'blur(16px)';
+                navbar.style.borderBottom = '1px solid rgba(255, 255, 255, 0.15)';
+                navbar.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
+            } else {
+                navbar.style.background = 'rgba(5, 5, 5, 0.5)';
+                navbar.style.backdropFilter = 'blur(12px)';
+                navbar.style.webkitBackdropFilter = 'blur(12px)';
+                navbar.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+                navbar.style.boxShadow = 'none';
+            }
+        });
+    }
 
-    // Highlight active nav link based on current page
-    const currentPath = window.location.pathname.split('/').pop();
+    // 6. Highlight active nav link based on current page
+    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
     const navItems = document.querySelectorAll('.nav-links a');
     navItems.forEach(item => {
         const itemPath = item.getAttribute('href');
-        if (itemPath === currentPath || (currentPath === '' && itemPath === 'index.html')) {
+        if (itemPath === currentPath) {
             item.classList.add('active');
         }
     });
